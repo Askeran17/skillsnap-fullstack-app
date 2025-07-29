@@ -1,0 +1,50 @@
+@using SkillSnap.Client.Models
+@using SkillSnap.Client.Services
+@inject ProjectService ProjectService
+@inject UserSessionService Session
+
+<h3 class="mb-3">📁 Проекты</h3>
+
+@if (Session.IsAdmin)
+{
+    <button class="btn btn-danger mb-3">➕ Добавить проект</button>
+}
+
+@if (projects == null)
+{
+    <p>⏳ Загрузка...</p>
+}
+else if (projects.Count == 0)
+{
+    <p>🔍 Нет доступных проектов</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var project in projects)
+        {
+            <li class="list-group-item">
+                <strong>@project.Title</strong><br />
+                @project.Description
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Project>? projects;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            projects = await ProjectService.GetProjectsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"⚠️ Ошибка загрузки проектов: {ex.Message}");
+        }
+    }
+}
+
+

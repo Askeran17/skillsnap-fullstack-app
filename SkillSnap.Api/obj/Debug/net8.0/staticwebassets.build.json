@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "yV+Z6I/r2yA8dzZHcFnpKe6x6eKJFjaJtJe3rdfxUL8=",
+  "Source": "SkillSnap.Api",
+  "BasePath": "_content/SkillSnap.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

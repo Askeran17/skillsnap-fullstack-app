@@ -1,0 +1,50 @@
+@using SkillSnap.Client.Services
+@inject ProjectService ProjectService
+
+@using SkillSnap.Client.Models
+
+@page "/add-project"
+@inject ProjectService ProjectService
+
+<h3>Add New Project</h3>
+
+<EditForm Model="newProject" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Title:</label>
+        <InputText @bind-Value="newProject.Title" class="form-control" />
+    </div>
+
+    <div>
+        <label>Description:</label>
+        <InputTextArea @bind-Value="newProject.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@if (statusMessage != null)
+{
+    <p>@statusMessage</p>
+}
+
+@code {
+    private Project newProject = new();
+    private string statusMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await ProjectService.AddProjectAsync(newProject);
+            statusMessage = "Project added successfully!";
+            newProject = new(); // Очистка формы
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error: {ex.Message}";
+        }
+    }
+}

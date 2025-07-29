@@ -1,0 +1,56 @@
+@page "/register"
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+
+@using System.ComponentModel.DataAnnotations
+@using SkillSnap.Client.Models
+@using SkillSnap.Client.Services
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>👤 Регистрация</h3>
+
+<EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name">Имя:</label>
+        <InputText @bind="registerModel.Name" id="name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="email">Email:</label>
+        <InputText @bind="registerModel.Email" id="email" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password">Пароль:</label>
+        <InputText @bind="registerModel.Password" id="password" type="password" class="form-control" />
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <button type="submit" class="btn btn-success">Зарегистрироваться</button>
+</EditForm>
+
+@code {
+    private RegisterModel registerModel = new();
+    private string? errorMessage;
+
+    private async Task HandleRegister()
+    {
+        var success = await AuthService.RegisterAsync(registerModel);
+        if (success)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            errorMessage = "❌ Ошибка регистрации. Проверьте введённые данные.";
+        }
+    }
+}
+

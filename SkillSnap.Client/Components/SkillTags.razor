@@ -1,0 +1,42 @@
+@using SkillSnap.Client.Models
+@using SkillSnap.Client.Services
+@inject SkillService SkillService
+
+<h3 class="mb-3">💡 Навыки</h3>
+
+@if (skills == null)
+{
+    <p>⏳ Загрузка...</p>
+}
+else if (skills.Count == 0)
+{
+    <p>⚠️ Нет доступных навыков</p>
+}
+else
+{
+    <div class="skill-list">
+        @foreach (var skill in skills)
+        {
+            <span class="skill-tag badge bg-info text-dark me-2 mb-2">
+                @skill.Name (@skill.Level)
+            </span>
+        }
+    </div>
+}
+
+@code {
+    private List<Skill>? skills;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            skills = await SkillService.GetSkillsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"⚠️ Ошибка загрузки навыков: {ex.Message}");
+        }
+    }
+}
+

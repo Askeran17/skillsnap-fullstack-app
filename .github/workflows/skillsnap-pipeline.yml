@@ -1,0 +1,65 @@
+name: SkillSnap CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-server:
+    name: 🔧 Build & Test SkillSnap API
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🧰 Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 📦 Restore dependencies
+      run: dotnet restore SkillSnap.Api/SkillSnap.Api.csproj
+
+    - name: 🔨 Build API
+      run: dotnet build SkillSnap.Api/SkillSnap.Api.csproj --configuration Release
+
+    - name: 🧪 Run API tests
+      run: |
+        if [ -d "SkillSnap.Tests" ]; then
+          dotnet test SkillSnap.Tests/SkillSnap.Tests.csproj --no-build --verbosity normal
+        else
+          echo "⚠️ No tests found. Skipping..."
+        fi
+
+  build-client:
+    name: 🎨 Build SkillSnap Blazor Client
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🧰 Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 📦 Restore dependencies
+      run: dotnet restore SkillSnap.Client/SkillSnap.Client.csproj
+
+    - name: 🔨 Build Blazor Client
+      run: dotnet build SkillSnap.Client/SkillSnap.Client.csproj --configuration Release
+
+    - name: 🌐 Publish Blazor Client
+      run: dotnet publish SkillSnap.Client/SkillSnap.Client.csproj -c Release -o release/
+
+    - name: 📤 Upload client artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: SkillSnap-Client
+        path: release/
+
+
