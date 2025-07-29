@@ -20,7 +20,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: 📦 Restore dependencies
+    - name: 📦 Restore dependencies (API)
       run: dotnet restore SkillSnap.Api/SkillSnap.Api.csproj
 
     - name: 🔨 Build API
@@ -47,7 +47,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: 📦 Restore dependencies
+    - name: 📦 Restore dependencies (Client)
       run: dotnet restore SkillSnap.Client/SkillSnap.Client.csproj
 
     - name: 🔨 Build Blazor Client
@@ -56,10 +56,15 @@ jobs:
     - name: 🌐 Publish Blazor Client
       run: dotnet publish SkillSnap.Client/SkillSnap.Client.csproj -c Release -o release/
 
+    - name: ✅ Check release contents
+      run: ls -la release/
+
     - name: 📤 Upload client artifact
       uses: actions/upload-artifact@v4
       with:
         name: SkillSnap-Client
         path: release/
+        overwrite: true
+
 
 
