@@ -8,20 +8,23 @@ namespace SkillSnap.Client.Services
     {
         private readonly HttpClient _http;
 
-        public ProjectService(HttpClient http)
-        {
-            _http = http;
-        }
+        public ProjectService(HttpClient httpClient)
+{
+    _http = httpClient;
+}
+
 
         public async Task<List<Project>> GetProjectsAsync()
         {
-            return await _http.GetFromJsonAsync<List<Project>>("https://localhost:7134/api/projects");
+            var result = await _http.GetFromJsonAsync<List<Project>>("api/projects");
+            return result ?? new();
         }
 
         public async Task AddProjectAsync(Project newProject)
         {
-            var response = await _http.PostAsJsonAsync("https://localhost:7134/api/projects", newProject);
+            var response = await _http.PostAsJsonAsync("api/projects", newProject);
             response.EnsureSuccessStatusCode();
         }
     }
 }
+

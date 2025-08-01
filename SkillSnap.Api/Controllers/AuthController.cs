@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Claims;
+using System.Globalization;
 
 namespace SkillSnap.Api.Controllers
 {
@@ -24,40 +25,92 @@ namespace SkillSnap.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+{
+    // 🔍 Выведем полученные данные
+    Console.WriteLine("Получено DTO:");
+    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(dto));
+
+    // 📣 Проверим валидацию и выведем ошибки
+    if (!ModelState.IsValid)
+    {
+        foreach (var kvp in ModelState)
         {
-            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email };
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (result.Succeeded)
+            foreach (var error in kvp.Value.Errors)
             {
-                await _userManager.AddToRoleAsync(user, "User");
-                return Ok();
+                Console.WriteLine($"Ошибка в поле {kvp.Key}: {error.ErrorMessage}");
             }
-            return BadRequest(result.Errors);
         }
+
+        return BadRequest(ModelState); // отправим ошибки обратно клиенту
+    }
+
+    // 💡 Логика создания пользователя
+    var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+    if (existingUser != null)
+        return BadRequest("Пользователь с таким Email уже существует.");
+
+    var user = new ApplicationUser
+    {
+        UserName = dto.UserName,
+        Email = dto.Email
+    };
+
+    var result = await _userManager.CreateAsync(user, dto.Password);
+    if (result.Succeeded)
+    {
+        await _userManager.AddToRoleAsync(user, "User");
+        return Ok();
+    }
+
+    return BadRequest(result.Errors);
+}
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
             {
-                var token = GenerateJwt(user);
+                var token = await GenerateJwt(user);
                 return Ok(new { token });
             }
-            return Unauthorized();
+
+            return Unauthorized("Неверный email или пароль.");
         }
 
-        private string GenerateJwt(ApplicationUser user)
+        [HttpPost("logout")]
+public async Task<IActionResult> Logout()
+{
+    await _signInManager.SignOutAsync(); // работает с Cookie Auth
+    return Ok("Вы вышли из системы.");
+}
+
+
+        private async Task<string> GenerateJwt(ApplicationUser user)
         {
-            var claims = new[]
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(
+                    ClaimTypes.Role,
+                    CultureInfo.InvariantCulture.TextInfo.ToTitleCase(role.ToLower())));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
@@ -68,7 +121,6 @@ namespace SkillSnap.Api.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
-
-    public class RegisterDto { public string Email { get; set; } public string Password { get; set; } }
-    public class LoginDto { public string Email { get; set; } public string Password { get; set; } }
 }
+
+

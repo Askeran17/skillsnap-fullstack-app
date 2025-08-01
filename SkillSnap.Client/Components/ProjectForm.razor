@@ -1,50 +1,68 @@
-@using SkillSnap.Client.Services
-@inject ProjectService ProjectService
-
-@using SkillSnap.Client.Models
-
 @page "/add-project"
+@using SkillSnap.Client.Models
+@using SkillSnap.Client.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject ProjectService ProjectService
 
-<h3>Add New Project</h3>
+<h3 class="mb-4">📁 Добавить проект</h3>
 
-<EditForm Model="newProject" OnValidSubmit="HandleValidSubmit">
+<EditForm Model="@newProject" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div>
-        <label>Title:</label>
-        <InputText @bind-Value="newProject.Title" class="form-control" />
+    <div class="mb-3">
+        <label for="title" class="form-label">Название:</label>
+        <InputText id="title"
+                   @bind-Value="newProject.Title"
+                   class="form-control" />
+        <ValidationMessage For="@(() => newProject.Title)" />
     </div>
 
-    <div>
-        <label>Description:</label>
-        <InputTextArea @bind-Value="newProject.Description" class="form-control" />
+    <div class="mb-3">
+        <label for="description" class="form-label">Описание:</label>
+        <InputTextArea id="description"
+                       @bind-Value="newProject.Description"
+                       class="form-control" />
+        <ValidationMessage For="@(() => newProject.Description)" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">🚀 Добавить</button>
 </EditForm>
 
-@if (statusMessage != null)
+@if (!string.IsNullOrWhiteSpace(statusMessage))
 {
-    <p>@statusMessage</p>
+    <div class="alert alert-info mt-4">@statusMessage</div>
 }
 
 @code {
-    private Project newProject = new();
-    private string statusMessage;
+    // Инициализация со значениями для required-свойств
+    private Project newProject = new()
+    {
+        Title = string.Empty,
+        Description = string.Empty
+    };
+
+    private string statusMessage = string.Empty;
 
     private async Task HandleValidSubmit()
     {
         try
         {
             await ProjectService.AddProjectAsync(newProject);
-            statusMessage = "Project added successfully!";
-            newProject = new(); // Очистка формы
+            statusMessage = "✅ Проект успешно добавлен!";
+            newProject = new()
+            {
+                Title = string.Empty,
+                Description = string.Empty
+            };
         }
         catch (Exception ex)
         {
-            statusMessage = $"Error: {ex.Message}";
+            statusMessage = $"❌ Ошибка при добавлении: {ex.Message}";
         }
     }
 }
+
+
+
+

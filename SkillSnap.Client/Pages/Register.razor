@@ -2,9 +2,7 @@
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
 
-@using System.ComponentModel.DataAnnotations
 @using SkillSnap.Client.Models
-@using SkillSnap.Client.Services
 @using Microsoft.AspNetCore.Components.Forms
 
 <h3>👤 Регистрация</h3>
@@ -14,18 +12,27 @@
     <ValidationSummary />
 
     <div class="mb-3">
-        <label for="name">Имя:</label>
-        <InputText @bind="registerModel.Name" id="name" class="form-control" />
+        <label>Имя пользователя:</label>
+        <InputText @bind-Value="registerModel.UserName" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.UserName)" />
     </div>
 
     <div class="mb-3">
-        <label for="email">Email:</label>
-        <InputText @bind="registerModel.Email" id="email" class="form-control" />
+        <label>Email:</label>
+        <InputText @bind-Value="registerModel.Email" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.Email)" />
     </div>
 
     <div class="mb-3">
-        <label for="password">Пароль:</label>
-        <InputText @bind="registerModel.Password" id="password" type="password" class="form-control" />
+        <label>Пароль:</label>
+        <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.Password)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Подтвердите пароль:</label>
+        <InputText @bind-Value="registerModel.ConfirmPassword" type="password" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
     </div>
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -37,7 +44,14 @@
 </EditForm>
 
 @code {
-    private RegisterModel registerModel = new();
+    private RegisterModel registerModel = new()
+{
+    Email = string.Empty,
+    Password = string.Empty,
+    ConfirmPassword = string.Empty,
+    UserName = string.Empty
+};
+
     private string? errorMessage;
 
     private async Task HandleRegister()
@@ -53,4 +67,7 @@
         }
     }
 }
+
+
+
 

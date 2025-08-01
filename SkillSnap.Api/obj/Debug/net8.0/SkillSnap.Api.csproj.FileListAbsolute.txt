@@ -141,3 +141,4 @@
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.pdb
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.genruntimeconfig.cache
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/ref/SkillSnap.Api.dll
+/Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.sourcelink.json
