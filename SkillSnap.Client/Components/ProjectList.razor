@@ -1,8 +1,11 @@
+@page "/projects"
 @using SkillSnap.Client.Models
 @using SkillSnap.Client.Services
 @inject ProjectService ProjectService
 @inject UserSessionService Session
-
+@inject IAuthService AuthService
+@if (AuthService.IsAuthenticated)
+{
 <h3 class="mb-3">📁 Проекты</h3>
 
 @if (Session.IsAdmin)
@@ -29,6 +32,10 @@ else
             </li>
         }
     </ul>
+}
+}
+else
+{<p class="alert alert-warning">🔐 Авторизуйтесь, чтобы просматривать проекты.</p>
 }
 
 @code {

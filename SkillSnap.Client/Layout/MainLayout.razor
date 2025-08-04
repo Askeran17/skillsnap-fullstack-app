@@ -1,5 +1,9 @@
 ﻿    @inherits LayoutComponentBase
     @inject IAuthService AuthService
+    @using SkillSnap.Client.Services
+@inject UserSessionService Session
+
+
 
     <div class="page">
         <div class="sidebar">
@@ -18,14 +22,18 @@
     </div>
 
     @code {
-        protected override void OnInitialized()
-        {
-            AuthService.OnAuthStateChanged += StateHasChanged;
-        }
-
-        public void Dispose()
-        {
-            AuthService.OnAuthStateChanged -= StateHasChanged;
-        }
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.TryRestoreSessionAsync();
+        AuthService.OnAuthStateChanged += StateHasChanged;
+        Session.Role = "Admin";
+        
     }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= StateHasChanged;
+    }
+}
+
 

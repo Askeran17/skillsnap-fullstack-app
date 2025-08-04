@@ -1,8 +1,12 @@
+@page "/skills"
 @using SkillSnap.Client.Models
 @using SkillSnap.Client.Services
 @inject SkillService SkillService
-
+@inject IAuthService AuthService
+@if (AuthService.IsAuthenticated)
+{
 <h3 class="mb-3">💡 Навыки</h3>
+
 
 @if (skills == null)
 {
@@ -22,7 +26,14 @@ else
             </span>
         }
     </div>
+    
 }
+}
+else
+{
+    <p class="alert alert-warning">🚫 Авторизуйтесь, чтобы видеть список навыков.</p>
+}
+
 
 @code {
     private List<Skill>? skills;

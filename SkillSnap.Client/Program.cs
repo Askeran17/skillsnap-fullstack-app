@@ -28,6 +28,8 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserSessionService>();
 builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<SkillService>();
+
 
 await builder.Build().RunAsync();
 

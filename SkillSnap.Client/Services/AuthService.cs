@@ -1,17 +1,18 @@
 using SkillSnap.Client.Models;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using SkillSnap.Client.Services;
 
 public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _jsRuntime;
+    private readonly UserSessionService _session;
 
     private const string TokenKey = "authToken";
-    private const string EmailKey = "userEmail";
-    private const string UserNameKey = "userName";
 
     public bool IsAuthenticated { get; private set; } = false;
     public string? UserEmail { get; private set; }
@@ -19,10 +20,11 @@ public class AuthService : IAuthService
 
     public event Action? OnAuthStateChanged;
 
-    public AuthService(HttpClient httpClient, IJSRuntime jsRuntime)
+    public AuthService(HttpClient httpClient, IJSRuntime jsRuntime, UserSessionService session)
     {
         _httpClient = httpClient;
         _jsRuntime = jsRuntime;
+        _session = session;
     }
 
     public async Task<bool> LoginAsync(LoginModel model)
@@ -31,13 +33,20 @@ public class AuthService : IAuthService
         if (response.IsSuccessStatusCode)
         {
             var data = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            if (!string.IsNullOrEmpty(data?.Token))
+            if (data != null && !string.IsNullOrEmpty(data.Token))
             {
                 await _jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, data.Token);
-                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", EmailKey, model.Email);
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userRole", data.Role);
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userEmail", data.Email);
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userName", data.UserName);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.Token);
+
+                UserEmail = data.Email;
+                UserName = data.UserName;
+                _session.Role = data.Role;
 
                 IsAuthenticated = true;
-                UserEmail = model.Email;
                 OnAuthStateChanged?.Invoke();
                 return true;
             }
@@ -45,6 +54,8 @@ public class AuthService : IAuthService
 
         IsAuthenticated = false;
         UserEmail = null;
+        UserName = null;
+        _session.Role = string.Empty;
         OnAuthStateChanged?.Invoke();
         return false;
     }
@@ -54,9 +65,6 @@ public class AuthService : IAuthService
         var response = await _httpClient.PostAsJsonAsync("api/auth/register", model);
         if (response.IsSuccessStatusCode)
         {
-            // ✅ Сохраняем имя пользователя
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", UserNameKey, model.UserName);
-
             return await LoginAsync(new LoginModel
             {
                 Email = model.Email,
@@ -70,13 +78,18 @@ public class AuthService : IAuthService
     public async Task LogoutAsync()
     {
         await _httpClient.PostAsync("api/auth/logout", null);
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", EmailKey);
-        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", UserNameKey);
+
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userEmail");
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userName");
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userRole");
 
         IsAuthenticated = false;
         UserEmail = null;
         UserName = null;
+        _session.Role = string.Empty;
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
 
         OnAuthStateChanged?.Invoke();
     }
@@ -84,20 +97,28 @@ public class AuthService : IAuthService
     public async Task TryRestoreSessionAsync()
     {
         var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
-        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", EmailKey);
-        var userName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", UserNameKey);
+        var role = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userRole");
+        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userEmail");
+        var name = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userName");
 
-        if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(email))
+        if (!string.IsNullOrWhiteSpace(token))
         {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             IsAuthenticated = true;
             UserEmail = email;
-            UserName = userName;
+            UserName = name;
+            _session.Role = role ?? string.Empty;
+
+            Console.WriteLine($"🔍 Restored Role: {_session.Role}");
+            Console.WriteLine($"🧠 IsAdmin: {_session.IsAdmin}");
         }
         else
         {
             IsAuthenticated = false;
             UserEmail = null;
             UserName = null;
+            _session.Role = string.Empty;
         }
 
         OnAuthStateChanged?.Invoke();
@@ -109,10 +130,15 @@ public class AuthService : IAuthService
     }
 }
 
+
 public class LoginResponse
 {
-    public string? Token { get; set; }
+    public string Token { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
 }
+
 
 
 

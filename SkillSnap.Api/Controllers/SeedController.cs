@@ -39,8 +39,8 @@ namespace SkillSnap.Api.Controllers
                 ProfileImageUrl = "https://example.com/images/jordan.png",
                 Projects = new List<Project>
                 {
-                    new Project { Title = "Task Tracker", Description = "Manage tasks effectively", ImageUrl = "https://example.com/images/task.png" },
-                    new Project { Title = "Weather App", Description = "Forecast weather using APIs", ImageUrl = "https://example.com/images/weather.png" }
+                    new Project { Title = "Task Tracker", Description = "Manage tasks effectively", ImageUrl = "https://example.com/images/task.png" }
+                    
                 },
                 Skills = new List<Skill>
                 {

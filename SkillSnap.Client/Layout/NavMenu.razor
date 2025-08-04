@@ -17,16 +17,27 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
+        
+
+    @if (AuthService.IsAuthenticated)
+{    
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+    <NavLink class="nav-link" href="projects">
+        <span class="bi bi-folder-nav-menu"></span> Projects
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="skills">
+        <span class="bi bi-lightbulb-nav-menu"></span> Skills
+    </NavLink>
+</div>
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="add-project">
+        <span class="bi bi-plus-circle-nav-menu"></span> Add Project
+    </NavLink>
+</div>
+}
+
         <hr />
 
         @if (AuthService.IsAuthenticated)

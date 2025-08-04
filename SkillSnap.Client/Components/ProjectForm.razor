@@ -3,7 +3,13 @@
 @using SkillSnap.Client.Services
 @using Microsoft.AspNetCore.Components.Forms
 @inject ProjectService ProjectService
+@inject IAuthService AuthService
 
+@inject UserSessionService Session
+
+<p class="text-muted">Роль: @Session.Role | Админ: @Session.IsAdmin.ToString()</p>
+@if (Session.IsAdmin)
+{
 <h3 class="mb-4">📁 Добавить проект</h3>
 
 <EditForm Model="@newProject" OnValidSubmit="HandleValidSubmit">
@@ -11,23 +17,29 @@
     <ValidationSummary />
 
     <div class="mb-3">
-        <label for="title" class="form-label">Название:</label>
-        <InputText id="title"
-                   @bind-Value="newProject.Title"
-                   class="form-control" />
-        <ValidationMessage For="@(() => newProject.Title)" />
-    </div>
+    <label for="title" class="form-label">Название:</label>
+    <InputText id="title" name="title"
+               @bind-Value="newProject.Title"
+               class="form-control" />
+    <ValidationMessage For="@(() => newProject.Title)" />
+</div>
 
-    <div class="mb-3">
-        <label for="description" class="form-label">Описание:</label>
-        <InputTextArea id="description"
-                       @bind-Value="newProject.Description"
-                       class="form-control" />
-        <ValidationMessage For="@(() => newProject.Description)" />
-    </div>
+<div class="mb-3">
+    <label for="description" class="form-label">Описание:</label>
+    <InputTextArea id="description" name="description"
+                   @bind-Value="newProject.Description"
+                   class="form-control" />
+    <ValidationMessage For="@(() => newProject.Description)" />
+</div>
+
 
     <button type="submit" class="btn btn-primary">🚀 Добавить</button>
 </EditForm>
+}
+else
+{
+    <p class="alert alert-danger">🚫 Только администратор может добавлять проекты.</p>
+}
 
 @if (!string.IsNullOrWhiteSpace(statusMessage))
 {
@@ -36,11 +48,12 @@
 
 @code {
     // Инициализация со значениями для required-свойств
-    private Project newProject = new()
-    {
-        Title = string.Empty,
-        Description = string.Empty
-    };
+    private ProjectDto newProject = new()
+{
+    Title = string.Empty,
+    Description = string.Empty
+};
+
 
     private string statusMessage = string.Empty;
 

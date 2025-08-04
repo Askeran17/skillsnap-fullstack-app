@@ -67,21 +67,32 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
 }
 
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+     [HttpPost("login")]
+public async Task<IActionResult> Login([FromBody] LoginDto dto)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+
+    var user = await _userManager.FindByEmailAsync(dto.Email);
+    if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
+    {
+        var token = await GenerateJwt(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "User";
+
+        return Ok(new
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            token,
+            email = user.Email,
+            userName = user.UserName,
+            role = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(role.ToLower())
+        });
+    }
 
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user != null && await _userManager.CheckPasswordAsync(user, dto.Password))
-            {
-                var token = await GenerateJwt(user);
-                return Ok(new { token });
-            }
+    return Unauthorized("Неверный email или пароль.");
+}
 
-            return Unauthorized("Неверный email или пароль.");
-        }
+
 
         [HttpPost("logout")]
 public async Task<IActionResult> Logout()
