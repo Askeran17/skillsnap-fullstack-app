@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Api.Data;
 using SkillSnap.Api.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,30 +23,32 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProjects()
+public async Task<IActionResult> GetProjects()
+{
+    if (!_cache.TryGetValue("projects", out List<ProjectDto> projectDtos))
     {
-        var sw = Stopwatch.StartNew();
+        projectDtos = await _context.Projects
+            .AsNoTracking()
+            .Include(p => p.PortfolioUser)
+            .Select(p => new ProjectDto
+            {
+                Title = p.Title,
+                Description = p.Description,
+                
+            })
+            .ToListAsync();
 
-        if (!_cache.TryGetValue("projects", out List<Project> projects))
-        {
-            projects = await _context.Projects
-                .AsNoTracking()
-                .Include(p => p.PortfolioUser)
-                .ToListAsync();
-
-            _cache.Set("projects", projects, TimeSpan.FromMinutes(5));
-            Console.WriteLine("🟡 Кэш MISS — загружено из БД");
-        }
-        else
-        {
-            Console.WriteLine("🟢 Кэш HIT — данные из памяти");
-        }
-
-        sw.Stop();
-        Console.WriteLine($"⏱️ DB Load Time: {sw.ElapsedMilliseconds}ms");
-
-        return Ok(projects);
+        _cache.Set("projects", projectDtos, TimeSpan.FromMinutes(5));
+        Console.WriteLine("🟡 Кэш MISS — загружено из БД");
     }
+    else
+    {
+        Console.WriteLine("🟢 Кэш HIT — данные из памяти");
+    }
+
+    return Ok(projectDtos);
+}
+
 
     [Authorize]
     [HttpPost]

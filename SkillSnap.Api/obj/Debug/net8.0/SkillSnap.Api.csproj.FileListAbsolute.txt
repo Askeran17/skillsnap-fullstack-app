@@ -127,6 +127,7 @@
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.csproj.CoreCompileInputs.cache
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.MvcApplicationPartsAssemblyInfo.cs
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.MvcApplicationPartsAssemblyInfo.cache
+/Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.sourcelink.json
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/staticwebassets.build.json
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/staticwebassets.development.json
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/staticwebassets/msbuild.SkillSnap.Api.Microsoft.AspNetCore.StaticWebAssets.props
@@ -141,4 +142,3 @@
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.pdb
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.genruntimeconfig.cache
 /Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/ref/SkillSnap.Api.dll
-/Users/mihailataev/Desktop/SkillSnap/SkillSnap.Api/obj/Debug/net8.0/SkillSnap.Api.sourcelink.json

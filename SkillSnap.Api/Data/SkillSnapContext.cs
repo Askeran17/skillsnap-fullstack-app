@@ -17,7 +17,7 @@ namespace SkillSnap.Api.Data
         {
             base.OnModelCreating(builder);
 
-            // ✅ PortfolioUser config
+            // 🔗 PortfolioUser configuration
             builder.Entity<PortfolioUser>(entity =>
             {
                 entity.Property(u => u.Name)
@@ -26,9 +26,17 @@ namespace SkillSnap.Api.Data
 
                 entity.Property(u => u.Bio)
                       .HasMaxLength(500);
+
+                entity.Property(u => u.ApplicationUserId)
+                      .IsRequired();
+
+                entity.HasOne(u => u.ApplicationUser)
+                      .WithMany() 
+                      .HasForeignKey(u => u.ApplicationUserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // ✅ Project config
+            // 📁 Project configuration
             builder.Entity<Project>(entity =>
             {
                 entity.Property(p => p.Title)
@@ -38,13 +46,13 @@ namespace SkillSnap.Api.Data
                 entity.Property(p => p.Description)
                       .HasMaxLength(300);
 
-                entity.HasOne(p => p.PortfolioUser)  // Навигация
+                entity.HasOne(p => p.PortfolioUser)
                       .WithMany(u => u.Projects)
                       .HasForeignKey(p => p.PortfolioUserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // ✅ Skill config
+            // 🧠 Skill configuration
             builder.Entity<Skill>(entity =>
             {
                 entity.Property(s => s.Name)

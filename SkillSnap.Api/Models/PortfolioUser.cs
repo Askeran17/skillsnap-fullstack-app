@@ -1,3 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using SkillSnap.Api.Models; 
+
 public class PortfolioUser
 {
     [Key]

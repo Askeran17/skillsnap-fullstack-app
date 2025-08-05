@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillSnap.Api.Data;
 
@@ -10,9 +11,11 @@ using SkillSnap.Api.Data;
 namespace SkillSnap.Api.Migrations
 {
     [DbContext(typeof(SkillSnapContext))]
-    partial class SkillSnapContextModelSnapshot : ModelSnapshot
+    [Migration("20250805170552_AddPortfolioUserRelations")]
+    partial class AddPortfolioUserRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
@@ -249,6 +252,10 @@ namespace SkillSnap.Api.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PortfolioUserId")
