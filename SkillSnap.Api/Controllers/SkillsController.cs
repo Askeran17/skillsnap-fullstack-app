@@ -1,8 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SkillSnap.Api.Data;
 using SkillSnap.Api.Models;
+using System.Security.Claims;
 
 namespace SkillSnap.Api.Controllers
 {
@@ -11,37 +13,81 @@ namespace SkillSnap.Api.Controllers
     public class SkillsController : ControllerBase
     {
         private readonly SkillSnapContext _context;
+        private readonly IMemoryCache _cache;
 
-        public SkillsController(SkillSnapContext context)
+        public SkillsController(SkillSnapContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
+        // 📦 Получение навыков с кэшированием
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Skill>>> GetSkills()
+        public async Task<IActionResult> GetSkills()
         {
-            var skills = await _context.Skills
-                .AsNoTracking()
-                .Include(s => s.PortfolioUser)
-                .ToListAsync();
+            if (!_cache.TryGetValue("skills", out List<SkillDto> skillDtos))
+            {
+                skillDtos = await _context.Skills
+                    .AsNoTracking()
+                    .Select(s => new SkillDto
+                    {
+                        Name = s.Name,
+                        Level = s.Level
+                    })
+                    .ToListAsync();
 
-            return Ok(skills);
+                _cache.Set("skills", skillDtos, TimeSpan.FromMinutes(5));
+                Console.WriteLine("🟡 Кэш MISS — загружено из БД");
+            }
+            else
+            {
+                Console.WriteLine("🟢 Кэш HIT — данные из памяти");
+            }
+
+            return Ok(skillDtos);
         }
 
-        [Authorize(Roles = "Admin")]
+        // 🔐 Добавление навыка с авторизацией
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Skill>> AddSkill([FromBody] Skill skill)
+        public async Task<IActionResult> AddSkill([FromBody] SkillDto dto)
         {
+            // ✅ Проверка модели
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var portfolioUserId = await _context.PortfolioUsers
+                .Where(p => p.ApplicationUserId == userId)
+                .Select(p => p.Id)
+                .FirstOrDefaultAsync();
+
+            if (portfolioUserId == 0)
+                return BadRequest("❌ Не найден связанный PortfolioUser.");
+
+            var skill = new Skill
+            {
+                Name = dto.Name,
+                Level = dto.Level,
+                PortfolioUserId = portfolioUserId
+            };
+
             _context.Skills.Add(skill);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSkills), new { id = skill.Id }, skill);
+            _cache.Remove("skills"); // ✅ сбрасываем кэш
+
+            return CreatedAtAction(nameof(GetSkills), new { id = skill.Id }, new SkillDto
+            {
+                Name = skill.Name,
+                Level = skill.Level
+            });
         }
     }
 }
+
+
 

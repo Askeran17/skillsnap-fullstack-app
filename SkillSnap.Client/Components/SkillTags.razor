@@ -1,42 +1,85 @@
 @page "/skills"
 @using SkillSnap.Client.Models
 @using SkillSnap.Client.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject SkillService SkillService
 @inject IAuthService AuthService
-@if (AuthService.IsAuthenticated)
-{
+@inject UserSessionService Session
+
 <h3 class="mb-3">💡 Навыки</h3>
 
+<p class="text-muted">Роль: @Session.Role | Админ: @Session.IsAdmin.ToString()</p>
 
-@if (skills == null)
-{
-    <p>⏳ Загрузка...</p>
-}
-else if (skills.Count == 0)
-{
-    <p>⚠️ Нет доступных навыков</p>
-}
-else
-{
-    <div class="skill-list">
-        @foreach (var skill in skills)
-        {
-            <span class="skill-tag badge bg-info text-dark me-2 mb-2">
-                @skill.Name (@skill.Level)
-            </span>
-        }
-    </div>
-    
-}
-}
-else
+@if (!AuthService.IsAuthenticated)
 {
     <p class="alert alert-warning">🚫 Авторизуйтесь, чтобы видеть список навыков.</p>
 }
+else
+{
+    @if (skills == null)
+    {
+        <p>⏳ Загрузка...</p>
+    }
+    else if (skills.Count == 0)
+    {
+        <p>⚠️ Нет доступных навыков</p>
+    }
+    else
+    {
+        <div class="skill-list mb-4">
+            @foreach (var skill in skills)
+            {
+                <span class="skill-tag badge bg-info text-dark me-2 mb-2">
+                    @skill.Name (@skill.Level)
+                </span>
+            }
+        </div>
+    }
 
+    @if (Session.IsAdmin)
+    {
+        <h4 class="mb-3">➕ Добавить навык</h4>
+
+        <EditForm Model="@newSkill" OnValidSubmit="AddSkill">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Название навыка:</label>
+                <InputText id="name" class="form-control" @bind-Value="newSkill.Name" autocomplete="name" />
+                <ValidationMessage For="@(() => newSkill.Name)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="level" class="form-label">Уровень:</label>
+                <InputText id="level" class="form-control" @bind-Value="newSkill.Level" autocomplete="off" />
+                <ValidationMessage For="@(() => newSkill.Level)" />
+            </div>
+
+            <button type="submit" class="btn btn-success">🚀 Добавить</button>
+        </EditForm>
+    }
+    else
+    {
+        <p class="alert alert-danger">🚫 Только администратор может добавлять навыки.</p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert alert-info mt-4">@statusMessage</div>
+    }
+}
 
 @code {
-    private List<Skill>? skills;
+    private List<SkillDto>? skills;
+    private SkillDto newSkill = new()
+{
+    Name = string.Empty,
+    Level = string.Empty
+};
+
+
+    private string statusMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,5 +92,22 @@ else
             Console.Error.WriteLine($"⚠️ Ошибка загрузки навыков: {ex.Message}");
         }
     }
+
+    private async Task AddSkill()
+    {
+        try
+        {
+            await SkillService.AddSkillAsync(newSkill);
+            skills = await SkillService.GetSkillsAsync();
+            newSkill = new SkillDto(); // очистка формы
+            statusMessage = "✅ Навык успешно добавлен!";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Ошибка при добавлении: {ex.Message}";
+        }
+    }
 }
+
+
 

@@ -13,13 +13,14 @@ namespace SkillSnap.Client.Services
             _http = http;
         }
 
-        public async Task<List<Skill>> GetSkillsAsync()
-        {
-            var result = await _http.GetFromJsonAsync<List<Skill>>("api/skills");
-            return result ?? new();
-        }
+        public async Task<List<SkillDto>> GetSkillsAsync()
+{
+    var result = await _http.GetFromJsonAsync<List<SkillDto>>("api/skills");
+    return result ?? new();
+}
 
-        public async Task AddSkillAsync(Skill newSkill)
+
+        public async Task AddSkillAsync(SkillDto newSkill)
         {
             var response = await _http.PostAsJsonAsync("api/skills", newSkill);
             response.EnsureSuccessStatusCode();

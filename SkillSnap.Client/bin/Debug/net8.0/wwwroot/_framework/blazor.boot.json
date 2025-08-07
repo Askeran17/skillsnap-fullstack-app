@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "SkillSnap.Client",
   "resources": {
-    "hash": "sha256-Mn9Bs3nwf/cOtHZmf+wT8ZmuDPSpQbdVhMZO7EORRqQ=",
+    "hash": "sha256-VQx8AdcBURqFcROv9KGmrPtJFvwvC8VpQBVOSqPgsUQ=",
     "jsModuleNative": {
       "dotnet.native.8.0.11.yorbhc9v7x.js": "sha256-VdKq87/z5NIxZKmuM+fv38XF+RcEb/bg3jVBwQSfwP4="
     },
@@ -212,10 +212,10 @@
       "mscorlib.wasm": "sha256-04e4k5XU8HWGB/dq/2+j84xzzGPflTs0IYWI0OxogVc=",
       "netstandard.wasm": "sha256-gnGZURPnoSmjXuYNCOJi5tt8qn2LRImWgue1Ru3/TDQ=",
       "System.Private.CoreLib.wasm": "sha256-6w3jYr0arcp8jnt4aeqh+AmqrLA6q7jl9rQYAwLzE0M=",
-      "SkillSnap.Client.wasm": "sha256-/zgzPsY3qKGCr4jgS54U1A/SfXRDOmRiwfy6kMojjgY="
+      "SkillSnap.Client.wasm": "sha256-KQuv8opaELp0EI4Vsa3z0kP+ov+UcGQVZJFSn1CphYc="
     },
     "pdb": {
-      "SkillSnap.Client.pdb": "sha256-sRXxCb0LhP7zUoOqxfzJ7LTefsdkOI2gdo6TQ6iu0hA="
+      "SkillSnap.Client.pdb": "sha256-JYQmZoULs1iuUMdxg0MiDZNj5P2JoM4QCx6az2GT+bY="
     }
   },
   "cacheBootResources": true,

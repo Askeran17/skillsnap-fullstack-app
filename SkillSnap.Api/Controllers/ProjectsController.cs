@@ -74,6 +74,8 @@ public async Task<IActionResult> GetProjects()
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
 
+        _cache.Remove("projects"); // ✅ сбрасываем кэш
+
         return CreatedAtAction(nameof(GetProjects), new { id = project.Id }, project);
     }
 

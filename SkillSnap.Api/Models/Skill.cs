@@ -13,6 +13,6 @@ namespace SkillSnap.Api.Models
         public int PortfolioUserId { get; set; }
 
         [ForeignKey("PortfolioUserId")]
-        public PortfolioUser PortfolioUser { get; set; }
+        public PortfolioUser? PortfolioUser { get; set; }
     }
 }
