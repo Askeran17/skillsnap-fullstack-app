@@ -14,7 +14,7 @@ else if (Session.IsAdmin)
 {
     <p class="text-muted">Role: @Session.Role | Admin: @Session.IsAdmin.ToString()</p>
 
-    <h3 class="mb-4">📁 Add Project</h3>
+    <h3 class="mb-4">➕ Add Project</h3>
 
     <EditForm Model="@newProject" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
