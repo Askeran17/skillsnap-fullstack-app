@@ -32,7 +32,7 @@ __Main content (Projects)__
 
 ![Add Project](/images-readme/add-project.png)
 
-- And whet project is added, you will see message about it
+- And when project is added, you will see message about it
 
 ![Confirmation to add project](/images-readme/confirmation-add-project.png)
 
@@ -40,7 +40,7 @@ __Main content (Projects)__
 
 ![Update Form](/images-readme/update-project.png)
 
-- When updating is done, click on "Save" and project will updated.
+- When updating is done, click on "Save" and project will be updated.
 
 ![Confirmation to updated project](/images-readme/confirmation-update-project.png)
 
@@ -55,11 +55,10 @@ __Skills page__
 
 - At the skills page admin can add, update and delete skills.
 
-![Skills List](/images-readme/skills-list.png)
 ![Add Skill](/images-readme/add-skill.png)
 ![Confirmation to add skill](/images-readme/confirmation-add-skill.png)
 ![Update Skill](/images-readme/update-skill.png)
-![Confirmation to updated Skill](/images-readme/confirmation-update-skill.png)
+![Confirmation to updated Skill](/images-readme/confirmation-updated-skill.png)
 ![Delete Skill](/images-readme/delete-skill.png)
 
 - Ordinary users can´t add, update or delete skills.
