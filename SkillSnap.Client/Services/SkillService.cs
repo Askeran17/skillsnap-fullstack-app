@@ -14,16 +14,28 @@ namespace SkillSnap.Client.Services
         }
 
         public async Task<List<SkillDto>> GetSkillsAsync()
-{
-    var result = await _http.GetFromJsonAsync<List<SkillDto>>("api/skills");
-    return result ?? new();
-}
-
+        {
+            var result = await _http.GetFromJsonAsync<List<SkillDto>>("api/skills");
+            return result ?? new();
+        }
 
         public async Task AddSkillAsync(SkillDto newSkill)
         {
             var response = await _http.PostAsJsonAsync("api/skills", newSkill);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task DeleteSkillAsync(int id)
+        {
+            var response = await _http.DeleteAsync($"api/skills/{id}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task UpdateSkillAsync(int id, SkillDto dto)
+        {
+            var response = await _http.PutAsJsonAsync($"api/skills/{id}", dto);
+            response.EnsureSuccessStatusCode();
+        }
     }
 }
+

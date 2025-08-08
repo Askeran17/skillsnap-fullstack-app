@@ -17,7 +17,7 @@ namespace SkillSnap.Api.Data
         {
             base.OnModelCreating(builder);
 
-            // 🔗 PortfolioUser configuration
+            
             builder.Entity<PortfolioUser>(entity =>
             {
                 entity.Property(u => u.Name)
@@ -36,7 +36,7 @@ namespace SkillSnap.Api.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // 📁 Project configuration
+            
             builder.Entity<Project>(entity =>
             {
                 entity.Property(p => p.Title)
@@ -52,7 +52,7 @@ namespace SkillSnap.Api.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // 🧠 Skill configuration
+            
             builder.Entity<Skill>(entity =>
             {
                 entity.Property(s => s.Name)

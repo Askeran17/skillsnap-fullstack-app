@@ -7,5 +7,7 @@ namespace SkillSnap.Client.Services
         public int? EditingProjectId { get; set; }
 
         public bool IsAdmin => Role == "Admin";
+        public bool IsUser => Role == "User";
+        public bool IsReady { get; set; } = false; 
     }
 }

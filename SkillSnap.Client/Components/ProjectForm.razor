@@ -4,41 +4,45 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject ProjectService ProjectService
 @inject IAuthService AuthService
-
 @inject UserSessionService Session
 
-<p class="text-muted">Роль: @Session.Role | Админ: @Session.IsAdmin.ToString()</p>
-@if (Session.IsAdmin)
+@if (!Session.IsReady)
 {
-<h3 class="mb-4">📁 Добавить проект</h3>
+    <p class="text-muted">⏳ Loading user data...</p>
+}
+else if (Session.IsAdmin)
+{
+    <p class="text-muted">Role: @Session.Role | Admin: @Session.IsAdmin.ToString()</p>
 
-<EditForm Model="@newProject" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <h3 class="mb-4">📁 Add Project</h3>
 
-    <div class="mb-3">
-    <label for="title" class="form-label">Название:</label>
-    <InputText id="title" name="title"
-               @bind-Value="newProject.Title"
-               class="form-control" />
-    <ValidationMessage For="@(() => newProject.Title)" />
-</div>
+    <EditForm Model="@newProject" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-<div class="mb-3">
-    <label for="description" class="form-label">Описание:</label>
-    <InputTextArea id="description" name="description"
-                   @bind-Value="newProject.Description"
-                   class="form-control" />
-    <ValidationMessage For="@(() => newProject.Description)" />
-</div>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title:</label>
+            <InputText id="title" name="title"
+                       @bind-Value="newProject.Title"
+                       class="form-control" />
+            <ValidationMessage For="@(() => newProject.Title)" />
+        </div>
 
+        <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <InputTextArea id="description" name="description"
+                           @bind-Value="newProject.Description"
+                           class="form-control" />
+            <ValidationMessage For="@(() => newProject.Description)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">🚀 Добавить</button>
-</EditForm>
+        <button type="submit" class="btn btn-primary">🚀 Add</button>
+    </EditForm>
 }
 else
 {
-    <p class="alert alert-danger">🚫 Только администратор может добавлять проекты.</p>
+    <p class="text-muted">Role: @Session.Role | Admin: @Session.IsAdmin.ToString()</p>
+    <p class="alert alert-danger">🚫 Only admins can add projects.</p>
 }
 
 @if (!string.IsNullOrWhiteSpace(statusMessage))
@@ -47,13 +51,11 @@ else
 }
 
 @code {
-    // Инициализация со значениями для required-свойств
     private ProjectDto newProject = new()
-{
-    Title = string.Empty,
-    Description = string.Empty
-};
-
+    {
+        Title = string.Empty,
+        Description = string.Empty
+    };
 
     private string statusMessage = string.Empty;
 
@@ -62,7 +64,7 @@ else
         try
         {
             await ProjectService.AddProjectAsync(newProject);
-            statusMessage = "✅ Проект успешно добавлен!";
+            statusMessage = "✅ Project successfully added!";
             newProject = new()
             {
                 Title = string.Empty,
@@ -71,7 +73,7 @@ else
         }
         catch (Exception ex)
         {
-            statusMessage = $"❌ Ошибка при добавлении: {ex.Message}";
+            statusMessage = $"❌ Error adding: {ex.Message}";
         }
     }
 }

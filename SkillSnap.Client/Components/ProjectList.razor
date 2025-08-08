@@ -4,42 +4,94 @@
 @inject ProjectService ProjectService
 @inject UserSessionService Session
 @inject IAuthService AuthService
+@inject IJSRuntime JSRuntime
+
+<h3 class="mb-3">📁 Projects</h3>
+
 @if (AuthService.IsAuthenticated)
 {
-<h3 class="mb-3">📁 Проекты</h3>
+    @if (Session.IsAdmin)
+    {
+        <h4 class="mb-3"> Projects list</h4>
 
-@if (Session.IsAdmin)
-{
-    <button class="btn btn-danger mb-3">➕ Добавить проект</button>
-}
+    }
 
-@if (projects == null)
-{
-    <p>⏳ Загрузка...</p>
-}
-else if (projects.Count == 0)
-{
-    <p>🔍 Нет доступных проектов</p>
+    @if (projects == null)
+    {
+        <p>⏳ Loading...</p>
+    }
+    else if (projects.Count == 0)
+    {
+        <p>🔍 No available projects</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var project in projects)
+            {
+                <li class="list-group-item">
+                    <strong>@project.Title</strong><br />
+                    @project.Description
+
+                    @if (Session.IsAdmin)
+                    {
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-warning me-2" @onclick="() => EditProject(project)">✏️ Edit</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(project.Id)">🗑️ Delete</button>
+                        </div>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert alert-info mt-4">@statusMessage</div>
+    }
+
+    @if (editingProject != null)
+    {
+        <div class="modal show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">✏️ Edit Project</h5>
+                        <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="@editingProject" OnValidSubmit="SaveProjectEdit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                <label class="form-label">Title:</label>
+                                <InputText class="form-control" @bind-Value="editingProject.Title" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description:</label>
+                                <InputTextArea class="form-control" @bind-Value="editingProject.Description" />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">💾 Save</button>
+                            <button type="button" class="btn btn-secondary ms-2" @onclick="CloseEditModal">Cancel</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 else
 {
-    <ul class="list-group">
-        @foreach (var project in projects)
-        {
-            <li class="list-group-item">
-                <strong>@project.Title</strong><br />
-                @project.Description
-            </li>
-        }
-    </ul>
-}
-}
-else
-{<p class="alert alert-warning">🔐 Авторизуйтесь, чтобы просматривать проекты.</p>
+    <p class="alert alert-warning">🔐 Please log in to view projects.</p>
 }
 
 @code {
     private List<ProjectDto>? projects;
+    private ProjectDto? editingProject;
+    private string statusMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,10 +101,67 @@ else
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"⚠️ Ошибка загрузки проектов: {ex.Message}");
+            Console.Error.WriteLine($"⚠️ Error loading projects: {ex.Message}");
+        }
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Delete project with ID {id}?");
+        if (confirmed)
+        {
+            await DeleteProject(id);
+        }
+    }
+
+    private async Task DeleteProject(int id)
+    {
+        try
+        {
+            await ProjectService.DeleteProjectAsync(id);
+            projects = await ProjectService.GetProjectsAsync();
+            statusMessage = $"🗑️ Project with ID {id} deleted.";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Error deleting: {ex.Message}";
+        }
+    }
+
+    private void EditProject(ProjectDto project)
+    {
+        editingProject = new ProjectDto
+        {
+            Id = project.Id,
+            Title = project.Title,
+            Description = project.Description
+        };
+    }
+
+    private void CloseEditModal()
+    {
+        editingProject = null;
+    }
+
+    private async Task SaveProjectEdit()
+    {
+        if (editingProject != null)
+        {
+            try
+            {
+                await ProjectService.UpdateProjectAsync(editingProject.Id, editingProject);
+                projects = await ProjectService.GetProjectsAsync();
+                editingProject = null;
+                statusMessage = "✅ Project successfully updated!";
+            }
+            catch (Exception ex)
+            {
+                statusMessage = $"❌ Error updating: {ex.Message}";
+            }
         }
     }
 }
+
 
 
 

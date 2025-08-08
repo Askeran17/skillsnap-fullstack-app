@@ -1,33 +1,33 @@
-﻿    @inherits LayoutComponentBase
-    @inject IAuthService AuthService
-    @using SkillSnap.Client.Services
+﻿@inherits LayoutComponentBase
+@inject IAuthService AuthService
+@using SkillSnap.Client.Services
 @inject UserSessionService Session
 
 
 
-    <div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-
-        <main>
-            <div class="top-row px-4">
-                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-            </div>
-
-            <article class="content px-4">
-                @Body
-            </article>
-        </main>
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
     </div>
 
-    @code {
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
     protected override async Task OnInitializedAsync()
     {
         await AuthService.TryRestoreSessionAsync();
         AuthService.OnAuthStateChanged += StateHasChanged;
-        Session.Role = "Admin";
-        
+
+
     }
 
     public void Dispose()
@@ -35,5 +35,3 @@
         AuthService.OnAuthStateChanged -= StateHasChanged;
     }
 }
-
-

@@ -5,14 +5,14 @@
 @using SkillSnap.Client.Models
 @using Microsoft.AspNetCore.Components.Forms
 
-<h3>👤 Регистрация</h3>
+<h3>👤 Sign Up</h3>
 
 <EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Имя пользователя:</label>
+        <label>Username:</label>
         <InputText @bind-Value="registerModel.UserName" class="form-control" />
         <ValidationMessage For="@(() => registerModel.UserName)" />
     </div>
@@ -24,13 +24,13 @@
     </div>
 
     <div class="mb-3">
-        <label>Пароль:</label>
+        <label>Password:</label>
         <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
         <ValidationMessage For="@(() => registerModel.Password)" />
     </div>
 
     <div class="mb-3">
-        <label>Подтвердите пароль:</label>
+        <label>Confirm Password:</label>
         <InputText @bind-Value="registerModel.ConfirmPassword" type="password" class="form-control" />
         <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
     </div>
@@ -40,7 +40,7 @@
         <div class="alert alert-danger">@errorMessage</div>
     }
 
-    <button type="submit" class="btn btn-success">Зарегистрироваться</button>
+    <button type="submit" class="btn btn-success">Sign Up</button>
 </EditForm>
 
 @code {
@@ -63,7 +63,7 @@
         }
         else
         {
-            errorMessage = "❌ Ошибка регистрации. Проверьте введённые данные.";
+            errorMessage = "❌ Registration error. Please check your input.";
         }
     }
 }

@@ -24,8 +24,21 @@ namespace SkillSnap.Client.Services
             var response = await _http.PostAsJsonAsync("api/projects", newProject);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task DeleteProjectAsync(int id)
+        {
+            var response = await _http.DeleteAsync($"api/projects/{id}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task UpdateProjectAsync(int id, ProjectDto dto)
+        {
+            var response = await _http.PutAsJsonAsync($"api/projects/{id}", dto);
+            response.EnsureSuccessStatusCode();
+        }
     }
 }
+
 
 
 

@@ -43,7 +43,7 @@
         @if (AuthService.IsAuthenticated)
         {
             <div class="nav-item px-3">
-                <span class="text-light">👋 Привет, @AuthService.UserEmail!</span>
+                <span class="text-light">👋 Hello, @AuthService.UserEmail!</span>
             </div>
             <div class="nav-item px-3">
                 <button class="btn btn-outline-danger w-100" @onclick="HandleLogout">
@@ -67,6 +67,8 @@
     </nav>
 </div>
 
+@implements IDisposable
+
 @code {
     private bool collapseNavMenu = true;
 
@@ -81,6 +83,16 @@
     {
         await AuthService.LogoutAsync();
         Navigation.NavigateTo("/login", true);
+    }
+
+    protected override void OnInitialized()
+    {
+        AuthService.OnAuthStateChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= StateHasChanged;
     }
 }
 

@@ -5,24 +5,25 @@
 @inject SkillService SkillService
 @inject IAuthService AuthService
 @inject UserSessionService Session
+@inject IJSRuntime JSRuntime
 
-<h3 class="mb-3">💡 Навыки</h3>
+<h3 class="mb-3">💡 Skills</h3>
 
-<p class="text-muted">Роль: @Session.Role | Админ: @Session.IsAdmin.ToString()</p>
+<p class="text-muted">Role: @Session.Role | Admin: @Session.IsAdmin.ToString()</p>
 
 @if (!AuthService.IsAuthenticated)
 {
-    <p class="alert alert-warning">🚫 Авторизуйтесь, чтобы видеть список навыков.</p>
+    <p class="alert alert-warning">🚫 Please log in to view the skills list.</p>
 }
 else
 {
     @if (skills == null)
     {
-        <p>⏳ Загрузка...</p>
+        <p>⏳ Loading...</p>
     }
     else if (skills.Count == 0)
     {
-        <p>⚠️ Нет доступных навыков</p>
+        <p>⚠️ No available skills</p>
     }
     else
     {
@@ -32,53 +33,92 @@ else
                 <span class="skill-tag badge bg-info text-dark me-2 mb-2">
                     @skill.Name (@skill.Level)
                 </span>
+
+                @if (Session.IsAdmin)
+                {
+                    <button class="btn btn-sm btn-warning me-2" @onclick="() => EditSkill(skill)">✏️</button>
+                    <button class="btn btn-sm btn-danger ms-1" @onclick="() => ConfirmDelete(skill.Id)">🗑️</button>
+                }
             }
         </div>
     }
 
     @if (Session.IsAdmin)
     {
-        <h4 class="mb-3">➕ Добавить навык</h4>
+        <h4 class="mb-3">➕ Add Skill</h4>
 
         <EditForm Model="@newSkill" OnValidSubmit="AddSkill">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="mb-3">
-                <label for="name" class="form-label">Название навыка:</label>
+                <label for="name" class="form-label">Skill Name:</label>
                 <InputText id="name" class="form-control" @bind-Value="newSkill.Name" autocomplete="name" />
                 <ValidationMessage For="@(() => newSkill.Name)" />
             </div>
 
             <div class="mb-3">
-                <label for="level" class="form-label">Уровень:</label>
+                <label for="level" class="form-label">Level:</label>
                 <InputText id="level" class="form-control" @bind-Value="newSkill.Level" autocomplete="off" />
                 <ValidationMessage For="@(() => newSkill.Level)" />
             </div>
 
-            <button type="submit" class="btn btn-success">🚀 Добавить</button>
+            <button type="submit" class="btn btn-success">🚀 Add</button>
         </EditForm>
     }
     else
     {
-        <p class="alert alert-danger">🚫 Только администратор может добавлять навыки.</p>
+        <p class="alert alert-danger">🚫 Only admins can add skills.</p>
     }
 
     @if (!string.IsNullOrWhiteSpace(statusMessage))
     {
         <div class="alert alert-info mt-4">@statusMessage</div>
     }
+
+    @if (editingSkill != null)
+    {
+        <div class="modal show d-block" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">✏️ Edit Skill</h5>
+                        <button type="button" class="btn-close" @onclick="CloseEditModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="@editingSkill" OnValidSubmit="SaveSkillEdit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                <label class="form-label">Name:</label>
+                                <InputText class="form-control" @bind-Value="editingSkill.Name" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Level:</label>
+                                <InputText class="form-control" @bind-Value="editingSkill.Level" />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">💾 Save</button>
+                            <button type="button" class="btn btn-secondary ms-2" @onclick="CloseEditModal">Cancel</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
     private List<SkillDto>? skills;
     private SkillDto newSkill = new()
-{
-    Name = string.Empty,
-    Level = string.Empty
-};
+    {
+        Name = string.Empty,
+        Level = string.Empty
+    };
 
-
+    private SkillDto? editingSkill;
     private string statusMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -89,7 +129,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"⚠️ Ошибка загрузки навыков: {ex.Message}");
+            Console.Error.WriteLine($"⚠️ Error loading skills: {ex.Message}");
         }
     }
 
@@ -99,15 +139,73 @@ else
         {
             await SkillService.AddSkillAsync(newSkill);
             skills = await SkillService.GetSkillsAsync();
-            newSkill = new SkillDto(); // очистка формы
-            statusMessage = "✅ Навык успешно добавлен!";
+            newSkill = new SkillDto(); 
+            statusMessage = "✅ Skill successfully added!";
         }
         catch (Exception ex)
         {
-            statusMessage = $"❌ Ошибка при добавлении: {ex.Message}";
+            statusMessage = $"❌ Error adding: {ex.Message}";
+        }
+    }
+
+    private async Task DeleteSkill(int id)
+    {
+        try
+        {
+            await SkillService.DeleteSkillAsync(id);
+            skills = await SkillService.GetSkillsAsync();
+            statusMessage = $"🗑️ Skill with ID {id} deleted.";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Error deleting: {ex.Message}";
+        }
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Delete skill with ID {id}?");
+        if (confirmed)
+        {
+            await DeleteSkill(id);
+        }
+    }
+
+    private void EditSkill(SkillDto skill)
+    {
+        editingSkill = new SkillDto
+        {
+            Id = skill.Id,
+            Name = skill.Name,
+            Level = skill.Level
+        };
+    }
+
+    private void CloseEditModal()
+    {
+        editingSkill = null;
+    }
+
+    private async Task SaveSkillEdit()
+    {
+        if (editingSkill != null)
+        {
+            try
+            {
+                await SkillService.UpdateSkillAsync(editingSkill.Id, editingSkill);
+                skills = await SkillService.GetSkillsAsync();
+                editingSkill = null;
+                statusMessage = "✅ Skill successfully updated!";
+            }
+            catch (Exception ex)
+            {
+                statusMessage = $"❌ Error updating: {ex.Message}";
+            }
         }
     }
 }
+
+
 
 
 

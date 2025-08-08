@@ -1,4 +1,3 @@
-// LoginDto.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace SkillSnap.Api.Models

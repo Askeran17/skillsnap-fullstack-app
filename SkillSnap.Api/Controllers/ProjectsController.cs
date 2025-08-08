@@ -23,31 +23,32 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-public async Task<IActionResult> GetProjects()
-{
-    if (!_cache.TryGetValue("projects", out List<ProjectDto> projectDtos))
+    public async Task<IActionResult> GetProjects()
     {
-        projectDtos = await _context.Projects
-            .AsNoTracking()
-            .Include(p => p.PortfolioUser)
-            .Select(p => new ProjectDto
-            {
-                Title = p.Title,
-                Description = p.Description,
-                
-            })
-            .ToListAsync();
+        if (!_cache.TryGetValue("projects", out List<ProjectDto> projectDtos))
+        {
+            projectDtos = await _context.Projects
+                .AsNoTracking()
+                .Include(p => p.PortfolioUser)
+                .Select(p => new ProjectDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
 
-        _cache.Set("projects", projectDtos, TimeSpan.FromMinutes(5));
-        Console.WriteLine("🟡 Кэш MISS — загружено из БД");
-    }
-    else
-    {
-        Console.WriteLine("🟢 Кэш HIT — данные из памяти");
-    }
+                })
+                .ToListAsync();
 
-    return Ok(projectDtos);
-}
+            _cache.Set("projects", projectDtos, TimeSpan.FromMinutes(5));
+            Console.WriteLine("🟡 Cache MISS — uploaded from DB");
+        }
+        else
+        {
+            Console.WriteLine("🟢 Cache HIT — data from memory");
+        }
+
+        return Ok(projectDtos);
+    }
 
 
     [Authorize]
@@ -62,7 +63,7 @@ public async Task<IActionResult> GetProjects()
             .FirstOrDefaultAsync();
 
         if (portfolioUserId == 0)
-            return BadRequest("Не найден связанный PortfolioUser.");
+            return BadRequest("There's no PortfolioUser.");
 
         var project = new Project
         {
@@ -74,11 +75,39 @@ public async Task<IActionResult> GetProjects()
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
 
-        _cache.Remove("projects"); // ✅ сбрасываем кэш
+        _cache.Remove("projects");
 
         return CreatedAtAction(nameof(GetProjects), new { id = project.Id }, project);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProject(int id, [FromBody] ProjectDto dto)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        if (project == null) return NotFound("Project not found.");
+
+        project.Title = dto.Title;
+        project.Description = dto.Description;
+        await _context.SaveChangesAsync();
+
+        _cache.Remove("projects");
+        return Ok("✅ Project updated.");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProject(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        if (project == null) return NotFound("Project not found.");
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
+
+        _cache.Remove("projects");
+        return Ok("🗑️ Project deleted.");
+    }
 
 
 

@@ -5,12 +5,12 @@
 @using SkillSnap.Client.Models
 @using Microsoft.AspNetCore.Components.Forms
 
-<h3 class="mb-3">🔐 Вход</h3>
+<h3 class="mb-3">🔐 Login</h3>
 
 @if (AuthService.IsAuthenticated)
 {
-    <div class="alert alert-success">Вы вошли как @AuthService.UserEmail</div>
-    <button class="btn btn-outline-danger" @onclick="HandleLogout">Выйти</button>
+    <div class="alert alert-success">You are logged in as @AuthService.UserEmail</div>
+    <button class="btn btn-outline-danger" @onclick="HandleLogout">Logout</button>
 }
 else
 {
@@ -35,7 +35,7 @@ else
             <div class="alert alert-danger">@errorMessage</div>
         }
 
-        <button type="submit" class="btn btn-primary">Войти</button>
+        <button type="submit" class="btn btn-primary">Login</button>
     </EditForm>
 }
 
@@ -57,7 +57,7 @@ else
         }
         else
         {
-            errorMessage = "❌ Ошибка входа. Проверьте данные.";
+            errorMessage = "❌ Login error. Please check your credentials.";
         }
     }
 

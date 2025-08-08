@@ -16,11 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 var config = builder.Configuration;
 
-// 🗄️ База данных
 builder.Services.AddDbContext<SkillSnapContext>(options =>
     options.UseSqlite(config.GetConnectionString("DefaultConnection")));
 
-// 🔐 Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -32,7 +30,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<SkillSnapContext>()
 .AddDefaultTokenProviders();
 
-// 🔐 JWT
 var jwtKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>
 {
@@ -60,7 +57,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddMemoryCache();
 
-// 🌍 Контроллеры и CORS
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -80,7 +76,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 📘 Swagger + JWT авторизация
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -88,12 +83,12 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "SkillSnap API",
         Version = "v1",
-        Description = "🔐 API для SkillSnap с поддержкой JWT авторизации"
+        Description = "🔐 API for SkillSnap with JWT authorization support"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Введите JWT токен с префиксом Bearer",
+        Description = "Enter JWT token with Bearer prefix",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
@@ -118,7 +113,6 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// 🟢 Инициализация ролей и пользователя при старте
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -138,13 +132,12 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // 👇 HTTPS редирект применяется только в продакшене
     app.UseHttpsRedirection();
 }
 
 
 
-app.UseRouting(); // 👈 обязательно до UseCors()
+app.UseRouting(); 
 
 app.UseCors("AllowLocalhost");
 
@@ -156,11 +149,10 @@ app.MapControllers();
 app.Run();
 
 
-// 🔧 Метод создания ролей
 async Task SeedRolesAsync(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "USER", "Admin" };
+    string[] roles = { "User", "Admin" };
 
     foreach (var role in roles)
     {
@@ -171,7 +163,6 @@ async Task SeedRolesAsync(IServiceProvider serviceProvider)
     }
 }
 
-// 👤 Метод создания админа
 async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
 {
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();

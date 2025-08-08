@@ -21,14 +21,14 @@ namespace SkillSnap.Api.Controllers
             _logger = logger;
         }
 
-        // 🔐 Только для Admin
+        
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Seed()
         {
             if (_context.PortfolioUsers.Any())
             {
-                _logger.LogInformation("Seed: Данные уже существуют — отменено.");
+                _logger.LogInformation("Seed: Data already exists — cancelled.");
                 return BadRequest("Demo data already exists.");
             }
 
@@ -52,12 +52,12 @@ namespace SkillSnap.Api.Controllers
             _context.PortfolioUsers.Add(user);
             _context.SaveChanges();
 
-            _logger.LogInformation("Seed: Демо-данные успешно добавлены.");
+            _logger.LogInformation("Seed: Demo data successfully added.");
 
             return Ok("Sample demo data inserted.");
         }
 
-        // ⚠️ Очистить данные (не рекомендуется для продакшна!)
+        
         [Authorize(Roles = "Admin")]
         [HttpDelete("clear")]
         public IActionResult Clear()
@@ -71,7 +71,7 @@ namespace SkillSnap.Api.Controllers
             _context.PortfolioUsers.RemoveRange(users);
             _context.SaveChanges();
 
-            _logger.LogWarning("Seed: Все демо-данные удалены.");
+            _logger.LogWarning("Seed: All demo data has been deleted.");
 
             return Ok("Demo data cleared.");
         }

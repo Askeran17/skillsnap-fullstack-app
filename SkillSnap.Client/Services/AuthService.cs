@@ -39,12 +39,14 @@ public class AuthService : IAuthService
                 await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userRole", data.Role);
                 await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userEmail", data.Email);
                 await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userName", data.UserName);
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userId", data.UserId);
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", data.Token);
 
                 UserEmail = data.Email;
                 UserName = data.UserName;
                 _session.Role = data.Role;
+                _session.UserId = data.UserId;
 
                 IsAuthenticated = true;
                 OnAuthStateChanged?.Invoke();
@@ -100,6 +102,7 @@ public class AuthService : IAuthService
         var role = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userRole");
         var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userEmail");
         var name = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userName");
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
 
         if (!string.IsNullOrWhiteSpace(token))
         {
@@ -109,6 +112,7 @@ public class AuthService : IAuthService
             UserEmail = email;
             UserName = name;
             _session.Role = role ?? string.Empty;
+            _session.UserId = userId;
 
             Console.WriteLine($"🔍 Restored Role: {_session.Role}");
             Console.WriteLine($"🧠 IsAdmin: {_session.IsAdmin}");
@@ -121,6 +125,7 @@ public class AuthService : IAuthService
             _session.Role = string.Empty;
         }
 
+        _session.IsReady = true;
         OnAuthStateChanged?.Invoke();
     }
 
@@ -140,6 +145,7 @@ public class LoginResponse
     public string Email { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
 }
 
 
