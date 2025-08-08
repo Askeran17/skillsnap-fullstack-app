@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillSnap.Api", "SkillSnap.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillSnap.Client", "SkillSnap.Client\SkillSnap.Client.csproj", "{B2D9FC90-5DE6-4350-9BBD-B841D2F43474}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillSnap.Tests.Api", "SkillSnap.Tests.Api\SkillSnap.Tests.Api.csproj", "{6AD61CFE-6E70-41A9-AA85-E585AF7B29D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillSnap.Tests.Client", "SkillSnap.Tests.Client\SkillSnap.Tests.Client.csproj", "{9B74BB2C-7EFD-441D-8E34-5A82E2011AB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{B2D9FC90-5DE6-4350-9BBD-B841D2F43474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2D9FC90-5DE6-4350-9BBD-B841D2F43474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2D9FC90-5DE6-4350-9BBD-B841D2F43474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD61CFE-6E70-41A9-AA85-E585AF7B29D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD61CFE-6E70-41A9-AA85-E585AF7B29D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD61CFE-6E70-41A9-AA85-E585AF7B29D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD61CFE-6E70-41A9-AA85-E585AF7B29D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B74BB2C-7EFD-441D-8E34-5A82E2011AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B74BB2C-7EFD-441D-8E34-5A82E2011AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B74BB2C-7EFD-441D-8E34-5A82E2011AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B74BB2C-7EFD-441D-8E34-5A82E2011AB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
