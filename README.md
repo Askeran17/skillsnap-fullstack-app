@@ -1,4 +1,4 @@
-# SkillSnap 🧠💼
+# SkillSnap 💼
 
 SkillSnap is a portfolio-driven web application that allows users to showcase their skills, projects, and professional growth. Built with ASP.NET Core and Blazor, it provides a clean interface for developers to present their work and for recruiters to explore talent.
 
@@ -11,6 +11,68 @@ SkillSnap is a portfolio-driven web application that allows users to showcase th
 - ⚡ In-memory caching for fast API responses
 - 📦 RESTful API built with ASP.NET Core
 - 🧪 Unit & integration tests with xUnit and EF Core InMemory
+
+### Existing Features
+
+__Homepage__
+
+- This web application have several pages: Home, Projects, Skills, Add Project and Login/Logout/Register. Its full responsive. You can also use it on mobile version.
+
+![Homepage](/images-readme/homepage.png)
+
+__Main content (Projects)__
+
+- When user or admin is logged in, it will see to list of projects. But only admin can see edit and delete button.
+
+![Project-List-Admin](/images-readme/project-list-admin.png)
+
+![Project-List-User](/images-readme/project-list-user.png)
+
+- To add new projects it will shows a form to fill it
+
+![Add Project](/images-readme/add-project.png)
+
+- And whet project is added, you will see message about it
+
+![Confirmation to add project](/images-readme/confirmation-add-project.png)
+
+- If you want to update so it need to click on edit button,
+
+![Update Form](/images-readme/update-project.png)
+
+- When updating is done, click on "Save" and project will updated.
+
+![Confirmation to updated project](/images-readme/confirmation-update-project.png)
+
+- If you want to delete project, just click on delete button and it will get a modal window there you can confirm if you want to delete project.
+
+![Delete Project](/images-readme/delete-project.png)
+
+- Ordinary users can´t add, update or delete skills.
+![User forbidden](/images-readme/user-forbidden-add-project.png)
+
+__Skills page__
+
+- At the skills page admin can add, update and delete skills.
+
+![Skills List](/images-readme/skills-list.png)
+![Add Skill](/images-readme/add-skill.png)
+![Confirmation to add skill](/images-readme/confirmation-add-skill.png)
+![Update Skill](/images-readme/update-skill.png)
+![Confirmation to updated Skill](/images-readme/confirmation-update-skill.png)
+![Delete Skill](/images-readme/delete-skill.png)
+
+- Ordinary users can´t add, update or delete skills.
+![User forbidden](/images-readme/user-list-forbidden.png)
+
+__Login/Logout__
+
+- To access the application's capabilities user need to type login and password: 
+
+-login: admin@example.com
+-password: AdminSecure123!
+
+![Login](/images-readme/login.png)
 
 ---
 
@@ -40,7 +102,7 @@ cd SkillSnap.Api
 dotnet run --launch-profile http
 ```
 
-This will start the API on the expected port (e.g. `http://localhost:5000`) and expose endpoints for the client.
+This will start the API on the expected port (e.g. `http://localhost:5024`) and expose endpoints for the client.
 
 2. **Start the Blazor client:**
 
